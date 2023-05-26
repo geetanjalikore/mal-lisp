@@ -34,14 +34,16 @@ const read_list = reader => {
 
 const read_atom = reader => {
   const token = reader.next();
-  if (token.match(/^-?[0-9]+$/)) {
-    return parseInt(token);
-  }
+  const digit = /^-?[0-9]+$/;
+
+  if (token.match(digit)) parseInt(token);
+
   return token;
 };
 
 const read_form = reader => {
   const token = reader.peek();
+
   switch (token) {
     case '(':
       reader.next();
