@@ -16,8 +16,8 @@ class MalSymbol extends MalValue {
 
 class MalList extends MalValue {
   constructor(value) {
-    super(value)
-  }
+    super(value);
+  };
 
   pr_str() {
     return '(' + this.value.map(x => x.pr_str()).join(' ') + ')';
@@ -26,11 +26,22 @@ class MalList extends MalValue {
 
 class MalVector extends MalValue {
   constructor(value) {
-    super(value)
+    super(value);
   }
 
   pr_str() {
     return '[' + this.value.map(x => x.pr_str()).join(' ') + ']';
   }
+};
+
+
+class MalNil extends MalValue {
+  constructor(value) {
+    super(null);
+  }
+
+  pr_str() {
+    return "nil";
+  }
 }
-module.exports = { MalList, MalSymbol, MalValue, MalVector };
+module.exports = { MalList, MalSymbol, MalValue, MalVector, MalNil };

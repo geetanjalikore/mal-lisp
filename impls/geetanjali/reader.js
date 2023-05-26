@@ -1,4 +1,4 @@
-const { MalSymbol, MalValue, MalList, MalVector } = require("./types");
+const { MalSymbol, MalValue, MalList, MalVector, MalNil } = require("./types");
 
 class Reader {
   constructor(tokens) {
@@ -60,6 +60,8 @@ const read_form = reader => {
       return read_list(reader);
     case '[':
       return read_vector(reader);
+    case 'nil':
+      return new MalNil('nil');
     default:
       return read_atom(reader);
   }
