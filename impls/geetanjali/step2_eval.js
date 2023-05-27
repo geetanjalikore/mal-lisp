@@ -8,19 +8,14 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-const add = (a, b) => a + b;
-const sub = (a, b) => a - b;
-const mul = (a, b) => a * b;
-const div = (a, b) => a / b;
-
-const operate = (operator, args) =>
-  args.slice(1).reduce((res, a) => operator(res, a.value), args[0].value);
+const operate = operator => (...args) =>
+  new MalValue(args.slice(1).reduce(operator, args[0]));
 
 const env = {
-  '+': (...args) => new MalValue(operate(add, args)),
-  '-': (...args) => new MalValue(operate(sub, args)),
-  '*': (...args) => new MalValue(operate(mul, args)),
-  '/': (...args) => new MalValue(operate(div, args)),
+  '+': operate((a, b) => a + b),
+  '-': operate((a, b) => a - b),
+  '*': operate((a, b) => a * b),
+  '/': operate((a, b) => a / b),
 };
 
 const eval_ast = (ast, env) => {
@@ -36,7 +31,6 @@ const eval_ast = (ast, env) => {
 
     return new MalVector(newVector);
   }
-
   return ast;
 }
 
@@ -47,7 +41,7 @@ const EVAL = (ast, env) => {
   if (ast.isEmpty()) return ast;
 
   const [fn, ...args] = eval_ast(ast, env).value;
-  return fn.apply(null, args);
+  return fn.apply(null, args.map((x) => x.value));
 };
 
 const PRINT = (malValue) => pr_str(malValue);
