@@ -47,7 +47,7 @@ const read_atom = reader => {
   const token = reader.next();
   const digit = /^-?[0-9]+$/;
 
-  if (token.match(digit)) new MalValue(parseInt(token));
+  if (token.match(digit)) return new MalValue(parseInt(token));
 
   return new MalSymbol(token);
 };
