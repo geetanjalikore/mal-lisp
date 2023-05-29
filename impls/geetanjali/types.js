@@ -34,7 +34,12 @@ class MalVector extends MalValue {
   }
 
   pr_str() {
-    return '[' + this.value.map(x => x.pr_str()).join(' ') + ']';
+    return '[' + this.value.map(x => {
+      if (x instanceof MalValue) {
+        return x.pr_str();
+      }
+      return x;
+    }).join(' ') + ']';
   }
 };
 
@@ -48,4 +53,15 @@ class MalNil extends MalValue {
     return "nil";
   }
 }
+
+class MalHashmap extends MalValue {
+  constructor(value) {
+    super(value)
+  }
+
+  pr_str() {
+    return
+  }
+}
+
 module.exports = { MalList, MalSymbol, MalValue, MalVector, MalNil };
