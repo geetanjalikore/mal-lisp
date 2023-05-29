@@ -12,7 +12,7 @@ class Env {
 
   find(symbol) {
     if (this.data[symbol.value]) return this;
-    if (this.#outer) return this.outer.find(symbol);
+    if (this.#outer) return this.#outer.find(symbol);
   }
 
   get(symbol) {
