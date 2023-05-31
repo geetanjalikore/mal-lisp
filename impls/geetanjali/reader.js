@@ -48,6 +48,8 @@ const read_atom = reader => {
 
   if (token.match(digit)) return parseInt(token);
   if (token === 'nil') return new MalNil();
+  if (token === 'true') return true;
+  if (token === 'false') return false;
 
   return new MalSymbol(token);
 };

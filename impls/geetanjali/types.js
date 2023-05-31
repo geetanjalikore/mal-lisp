@@ -41,6 +41,10 @@ class MalVector extends MalValue {
       return x;
     }).join(' ') + ']';
   }
+
+  isEmpty() {
+    return this.value.length === 0;
+  }
 };
 
 
@@ -51,16 +55,6 @@ class MalNil extends MalValue {
 
   pr_str() {
     return "nil";
-  }
-}
-
-class MalHashmap extends MalValue {
-  constructor(value) {
-    super(value)
-  }
-
-  pr_str() {
-    return
   }
 }
 
