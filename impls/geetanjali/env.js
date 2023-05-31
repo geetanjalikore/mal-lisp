@@ -1,9 +1,16 @@
 class Env {
   #outer;
   data;
-  constructor(outer) {
+  constructor(outer, binds) {
     this.#outer = outer;
     this.data = {};
+    this.bindParameters(binds);
+  }
+
+  bindParameters(binds) {
+    if (binds) {
+      binds.forEach(bind => this.data[bind]);
+    }
   }
 
   set(symbol, malValue) {

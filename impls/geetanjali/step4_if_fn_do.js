@@ -66,6 +66,19 @@ const evalIF = (ast, env) => {
     EVAL(exp2, env) : EVAL(exp1, env);
 };
 
+const bindFunction = (ast, env) => {
+  return (...parameters) => {
+    const fnScope = new Env(env);
+    const paramList = ast.value[1].value;
+
+    paramList.forEach((symbol, i) => {
+      fnScope.set(symbol, parameters[i]);
+    });
+
+    return EVAL(ast.value[2], fnScope);
+  };
+};
+
 const READ = (expression) => read_str(expression);
 
 const EVAL = (ast, env) => {
@@ -79,6 +92,7 @@ const EVAL = (ast, env) => {
     case 'do': return evalDo(ast, env);
     case 'println': return evalPrint(ast, env);
     case 'if': return evalIF(ast, env);
+    case 'fn*': return bindFunction(ast, env);
   }
 
   const [fn, ...args] = eval_ast(ast, env).value;
