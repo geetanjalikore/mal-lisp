@@ -58,10 +58,17 @@ const evalPrint = (ast, env) => {
   return new MalNil();
 };
 
+const evalIF = (ast, env) => {
+  const [condExp, exp1, exp2] = ast.value.slice(1);
+
+  const res = EVAL(condExp, env);
+  return (res === false || res instanceof MalNil) ?
+    EVAL(exp2, env) : EVAL(exp1, env);
+};
+
 const READ = (expression) => read_str(expression);
 
 const EVAL = (ast, env) => {
-  console.log(ast);
   if (!(ast instanceof MalList)) return eval_ast(ast, env);
   if (ast.isEmpty()) return ast;
   const bindingFn = ast.value[0].value;
@@ -71,6 +78,7 @@ const EVAL = (ast, env) => {
     case 'let*': return bindLet(ast, env);
     case 'do': return evalDo(ast, env);
     case 'println': return evalPrint(ast, env);
+    case 'if': return evalIF(ast, env);
   }
 
   const [fn, ...args] = eval_ast(ast, env).value;
