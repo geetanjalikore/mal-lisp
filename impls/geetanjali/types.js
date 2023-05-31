@@ -45,7 +45,7 @@ class MalVector extends MalValue {
 
 
 class MalNil extends MalValue {
-  constructor(value) {
+  constructor() {
     super(null);
   }
 

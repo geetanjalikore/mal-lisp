@@ -29,9 +29,8 @@ const read_seq = (reader, close) => {
 
   reader.next();
   while (reader.peek() !== close) {
-    if (reader.peek() === undefined) {
-      throw "unbalanced";
-    }
+    if (reader.peek() === undefined) throw "unbalanced";
+
     ast.push(read_form(reader));
   }
 
@@ -48,6 +47,7 @@ const read_atom = reader => {
   const digit = /^-?[0-9]+$/;
 
   if (token.match(digit)) return parseInt(token);
+  if (token === 'nil') return new MalNil();
 
   return new MalSymbol(token);
 };
@@ -56,14 +56,9 @@ const read_form = reader => {
   const token = reader.peek();
 
   switch (token) {
-    case '(':
-      return read_list(reader);
-    case '[':
-      return read_vector(reader);
-    case 'nil':
-      return new MalNil('nil');
-    default:
-      return read_atom(reader);
+    case '(': return read_list(reader);
+    case '[': return read_vector(reader);
+    default: return read_atom(reader);
   }
 };
 
