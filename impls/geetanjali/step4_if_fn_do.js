@@ -111,6 +111,10 @@ env.set(new MalSymbol('/'), operate((a, b) => a / b));
 env.set(new MalSymbol('list'), (...args) => new MalList(args));
 env.set(new MalSymbol('list?'), (lst) => lst instanceof MalList);
 env.set(new MalSymbol('empty?'), (lst) => lst?.isEmpty());
+env.set(new MalSymbol('>'), (...args) => !(args.find((a, i) => (a >= args[i - 1]))));
+env.set(new MalSymbol('<'), (...args) => !(args.find((a, i) => (a <= args[i - 1]))));
+env.set(new MalSymbol('>='), (...args) => !(args.find((a, i) => (a > args[i - 1]))));
+env.set(new MalSymbol('<='), (...args) => !(args.find((a, i) => (a < args[i - 1]))));
 
 const rep = str => PRINT(EVAL(READ(str), env));
 
