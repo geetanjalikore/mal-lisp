@@ -14,13 +14,15 @@ class MalSymbol extends MalValue {
   }
 }
 
-class MalList extends MalValue {
+class MalIterable extends MalValue {
   constructor(value) {
     super(value);
-  };
+  }
 
   pr_str() {
-    return '(' + this.value.map(x => x.pr_str()).join(' ') + ')';
+    return this.value.map(x => {
+      return x instanceof MalValue ? x.pr_str() : x;
+    }).join(' ');
   }
 
   isEmpty() {
@@ -32,26 +34,23 @@ class MalList extends MalValue {
   }
 }
 
-class MalVector extends MalValue {
+class MalList extends MalIterable {
+  constructor(value) {
+    super(value);
+  };
+
+  pr_str() {
+    return '(' + super.pr_str() + ')';
+  }
+}
+
+class MalVector extends MalIterable {
   constructor(value) {
     super(value);
   }
 
   pr_str() {
-    return '[' + this.value.map(x => {
-      if (x instanceof MalValue) {
-        return x.pr_str();
-      }
-      return x;
-    }).join(' ') + ']';
-  }
-
-  isEmpty() {
-    return this.value.length === 0;
-  }
-
-  count() {
-    return this.value.length;
+    return '[' + super.pr_str() + ']';
   }
 };
 
@@ -116,5 +115,6 @@ module.exports = {
   MalNil,
   MalString,
   MalHashmap,
-  MalFunction
+  MalFunction,
+  MalIterable,
 };

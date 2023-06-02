@@ -1,5 +1,3 @@
-const { MalSymbol } = require("./types");
-
 class Env {
   #outer;
   data;

@@ -2,8 +2,12 @@ const readline = require("readline");
 const { read_str } = require("./reader.js");
 const { pr_str } = require("./printer");
 const { Env } = require("./env.js");
-const { MalSymbol, MalList, MalVector, MalNil, MalString, MalFunction } = require("./types.js");
-const { ns } = require("./core.js");
+const { env } = require("./core.js");
+const { MalSymbol,
+  MalList,
+  MalVector,
+  MalNil,
+  MalFunction, } = require("./types.js");
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -22,8 +26,7 @@ const bindLet = (ast, env) => {
   for (let i = 0; i < bindingList.length; i += 2)
     lexicalEnv.set(bindingList[i], EVAL(bindingList[i + 1], lexicalEnv));
 
-  const expr = ast.value.slice(2);
-  const doExpr = new MalList(new MalSymbol('do'), ...expr);
+  const doExpr = new MalList(new MalSymbol('do'), ...ast.value.slice(2));
   return [doExpr, lexicalEnv];
 };
 
@@ -31,13 +34,6 @@ const evalDo = (ast, env) => {
   const forms = ast.value.slice(1);
   forms.slice(0, -1).forEach(exp => EVAL(exp, env));
   return forms[forms.length - 1];
-};
-
-const evalPrint = (ast, env) => {
-  const result = ast.value.slice(1).reduce((res, exp) =>
-    res.concat(pr_str(EVAL(exp, env)), ' '), '');
-  console.log(result);
-  return new MalNil();
 };
 
 const evalIF = (ast, env) => {
@@ -52,8 +48,6 @@ const bindFunction = (ast, env) => {
   const doForms = new MalList([new MalSymbol('do'), ...fnBody]);
   return new MalFunction(doForms, paramList, env);
 };
-
-const evalPrn = evalPrint;
 
 const READ = (expression) => read_str(expression);
 
@@ -90,8 +84,6 @@ const EVAL = (ast, env) => {
       case 'if':
         ast = evalIF(ast, env);
         break;
-      case 'println': return evalPrint(ast, env);
-      case 'prn': return evalPrint(ast, env);
       case 'fn*':
         ast = bindFunction(ast, env);
         break;
@@ -109,9 +101,6 @@ const EVAL = (ast, env) => {
 };
 
 const PRINT = (malValue) => pr_str(malValue);
-
-const env = new Env();
-Object.entries(ns).forEach(([symbol, fn]) => env.set(new MalSymbol(symbol), fn));
 
 const rep = str => PRINT(EVAL(READ(str), env));
 

@@ -36,13 +36,6 @@ const evalDo = (ast, env) => {
   return result[result.length - 1];
 };
 
-const evalPrint = (ast, env) => {
-  const result = ast.value.slice(1).reduce((res, exp) =>
-    res.concat(pr_str(EVAL(exp, env)), ' '), '');
-  console.log(result);
-  return new MalNil();
-};
-
 const evalIF = (ast, env) => {
   const [condExp, exp1, exp2] = ast.value.slice(1);
 
@@ -61,8 +54,6 @@ const bindFunction = (ast, env) => {
     return EVAL(ast.value[2], fnScope);
   };
 };
-
-const evalPrn = (ast, env) => evalPrint;
 
 const READ = (expression) => read_str(expression);
 
@@ -91,10 +82,8 @@ const EVAL = (ast, env) => {
     case 'def!': return bindDef(ast, env);
     case 'let*': return bindLet(ast, env);
     case 'do': return evalDo(ast, env);
-    case 'println': return evalPrint(ast, env);
     case 'if': return evalIF(ast, env);
     case 'fn*': return bindFunction(ast, env);
-    case 'prn': return evalPrint(ast, env);
   }
 
   const [fn, ...args] = eval_ast(ast, env).value;
