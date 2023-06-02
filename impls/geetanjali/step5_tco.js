@@ -2,7 +2,7 @@ const readline = require("readline");
 const { read_str } = require("./reader.js");
 const { pr_str } = require("./printer");
 const { Env } = require("./env.js");
-const { MalSymbol, MalList, MalVector, MalNil, MalString } = require("./types.js");
+const { MalSymbol, MalList, MalVector, MalNil, MalString, MalFunction } = require("./types.js");
 const { ns } = require("./core.js");
 
 const rl = readline.createInterface({
@@ -23,17 +23,14 @@ const bindLet = (ast, env) => {
     lexicalEnv.set(bindingList[i], EVAL(bindingList[i + 1], lexicalEnv));
 
   const expr = ast.value.slice(2);
-  if (expr) {
-    const result = EVAL((new MalVector(expr)), lexicalEnv).value;
-    return result[result.length - 1];
-  }
-
-  return new MalNil();
+  const doExpr = new MalList(new MalSymbol('do'), ...expr);
+  return [doExpr, lexicalEnv];
 };
 
 const evalDo = (ast, env) => {
-  const result = ast.value.slice(1).map(exp => EVAL(exp, env));
-  return result[result.length - 1];
+  const forms = ast.value.slice(1);
+  forms.slice(0, -1).forEach(exp => EVAL(exp, env));
+  return forms[forms.length - 1];
 };
 
 const evalPrint = (ast, env) => {
@@ -47,18 +44,13 @@ const evalIF = (ast, env) => {
   const [condExp, exp1, exp2] = ast.value.slice(1);
 
   const res = EVAL(condExp, env);
-  return (res === false || res instanceof MalNil) ?
-    EVAL(exp2, env) : EVAL(exp1, env);
+  return (res === false || res instanceof MalNil) ? exp2 : exp1;
 };
 
 const bindFunction = (ast, env) => {
-  return (...parameters) => {
-    const paramList = ast.value[1].value;
-    const args = parameters.map(p => EVAL(p, env));
-
-    const fnScope = new Env(env, paramList, args);
-    return EVAL(ast.value[2], fnScope);
-  };
+  const [paramList, ...fnBody] = ast.value.slice(1);
+  const doForms = new MalList([new MalSymbol('do'), ...fnBody]);
+  return new MalFunction(doForms, paramList, env);
 };
 
 const evalPrn = evalPrint;
@@ -82,22 +74,38 @@ const eval_ast = (ast, env) => {
 };
 
 const EVAL = (ast, env) => {
-  if (!(ast instanceof MalList)) return eval_ast(ast, env);
-  if (ast.isEmpty()) return ast;
-  const bindingFn = ast.value[0].value;
+  while (true) {
+    if (!(ast instanceof MalList)) return eval_ast(ast, env);
+    if (ast.isEmpty()) return ast;
+    const bindingFn = ast.value[0].value;
 
-  switch (bindingFn) {
-    case 'def!': return bindDef(ast, env);
-    case 'let*': return bindLet(ast, env);
-    case 'do': return evalDo(ast, env);
-    case 'println': return evalPrint(ast, env);
-    case 'if': return evalIF(ast, env);
-    case 'fn*': return bindFunction(ast, env);
-    case 'prn': return evalPrint(ast, env);
+    switch (bindingFn) {
+      case 'def!': return bindDef(ast, env);
+      case 'let*':
+        [ast, env] = bindLet(ast, env);
+        break;
+      case 'do':
+        ast = evalDo(ast, env);
+        break;
+      case 'if':
+        ast = evalIF(ast, env);
+        break;
+      case 'println': return evalPrint(ast, env);
+      case 'prn': return evalPrint(ast, env);
+      case 'fn*':
+        ast = bindFunction(ast, env);
+        break;
+      default:
+        const [fn, ...args] = eval_ast(ast, env).value;
+        if (fn instanceof MalFunction) {
+          const fnScope = new Env(fn.env, fn.params.value, args);
+          ast = fn.value;
+          env = fnScope;
+        } else {
+          return fn.apply(null, args);
+        }
+    }
   }
-
-  const [fn, ...args] = eval_ast(ast, env).value;
-  return fn.apply(null, args);
 };
 
 const PRINT = (malValue) => pr_str(malValue);

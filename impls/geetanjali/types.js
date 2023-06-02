@@ -97,6 +97,17 @@ class MalNil extends MalValue {
   }
 }
 
+class MalFunction extends MalValue {
+  constructor(fnBody, params, env) {
+    super(fnBody);
+    this.params = params;
+    this.env = env;
+  }
+  pr_str() {
+    return "#<function>";
+  }
+}
+
 module.exports = {
   MalList,
   MalSymbol,
@@ -104,5 +115,6 @@ module.exports = {
   MalVector,
   MalNil,
   MalString,
-  MalHashmap
+  MalHashmap,
+  MalFunction
 };
