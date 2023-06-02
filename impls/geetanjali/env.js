@@ -1,9 +1,21 @@
+const { MalSymbol } = require("./types");
+
 class Env {
   #outer;
   data;
-  constructor(outer) {
+  constructor(outer, binds, expr) {
     this.#outer = outer;
     this.data = {};
+    this.binds = binds;
+    this.expr = expr;
+    this.#bindExp();
+  }
+
+  #bindExp() {
+    if (this.binds) {
+      this.binds.forEach((bindSym, i) =>
+        this.set(bindSym, this.expr[i]));
+    }
   }
 
   set(symbol, malValue) {

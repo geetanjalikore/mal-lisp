@@ -53,16 +53,15 @@ const evalIF = (ast, env) => {
 
 const bindFunction = (ast, env) => {
   return (...parameters) => {
-    const fnScope = new Env(env);
     const paramList = ast.value[1].value;
-    paramList.forEach(
-      (symbol, i) => fnScope.set(symbol, EVAL(parameters[i], env)));
+    const args = parameters.map(p => EVAL(p, env));
 
+    const fnScope = new Env(env, paramList, args);
     return EVAL(ast.value[2], fnScope);
   };
 };
 
-const evalPrn = (ast, env) => evalPrint;
+const evalPrn = evalPrint;
 
 const READ = (expression) => read_str(expression);
 

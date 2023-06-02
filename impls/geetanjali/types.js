@@ -55,6 +55,28 @@ class MalVector extends MalValue {
   }
 };
 
+class MalHashmap extends MalValue {
+  constructor(value) {
+    super(value);
+  }
+
+  pr_str() {
+    let res = '';
+    for (let i = 0; i < this.value.length; i += 2) {
+      res += `:${this.value[i].value} ${this.value[i + 1]} `;
+    }
+    return `{${res}}`;
+  }
+
+  isEmpty() {
+    return this.value.length === 0;
+  }
+
+  count() {
+    return this.value.length / 2;
+  }
+};
+
 class MalString extends MalValue {
   constructor(value) {
     super(value);
@@ -75,4 +97,12 @@ class MalNil extends MalValue {
   }
 }
 
-module.exports = { MalList, MalSymbol, MalValue, MalVector, MalNil, MalString };
+module.exports = {
+  MalList,
+  MalSymbol,
+  MalValue,
+  MalVector,
+  MalNil,
+  MalString,
+  MalHashmap
+};
