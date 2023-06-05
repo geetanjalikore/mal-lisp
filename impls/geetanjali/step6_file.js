@@ -103,6 +103,9 @@ const EVAL = (ast, env) => {
 const PRINT = (malValue) => pr_str(malValue);
 
 const rep = str => PRINT(EVAL(READ(str), env));
+env.set(new MalSymbol('eval'), ast => EVAL(ast, env));
+
+rep('(def! load-file (fn* (f) (eval (read-string (str "(do " (slurp f) "\nnil)")))))');
 
 const repl = () => {
   rl.question('user> ', (line) => {

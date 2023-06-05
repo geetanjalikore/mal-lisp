@@ -51,8 +51,8 @@ const read_list = reader => new MalList(read_seq(reader, ')'));
 const read_hashmap = reader => new MalHashmap(read_seq(reader, '}'));
 
 const createMalString = (str) => {
-  const val = str.replace(/\\(.)/g, (y, cap) =>
-    cap === 'n' ? '\n' : cap);
+  const val = str.replace(/\\(.)/g,
+    (y, cap) => cap === 'n' ? '\n' : cap);
 
   return new MalString(val);
 };

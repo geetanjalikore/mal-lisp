@@ -1,4 +1,4 @@
-const pr_str = (malValue, readably) => {
+const pr_str = (malValue, readably = true) => {
   return malValue instanceof MalValue ? malValue.pr_str(readably) : malValue.toString();
 };
 
@@ -127,6 +127,11 @@ class MalAtom extends MalValue {
   }
 
   deref() {
+    return this.value;
+  }
+
+  reset(value) {
+    this.value = value;
     return this.value;
   }
 }

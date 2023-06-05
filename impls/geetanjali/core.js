@@ -59,15 +59,14 @@ const ns = {
   },
   'println': println,
   'prn': println,
-  'read-string': string => read_str(pr_str(string, true)),
+  'read-string': string => read_str(pr_str(string, false)),
   'slurp': fileName => new MalString(fs.readFileSync(fileName.value, 'utf-8')),
   'atom': value => {
     return new MalAtom(value);
   },
   'atom?': value => value instanceof MalAtom,
-  'deref': atom => {
-    return atom.deref();
-  },
+  'deref': atom => atom.deref(),
+  'reset!': (atom, value) => atom.reset(value),
 };
 
 const env = new Env();
