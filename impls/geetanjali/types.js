@@ -89,7 +89,7 @@ class MalString extends MalValue {
     if (readably) {
       return `"${this.value
         .replace(/\\/g, "\\\\")
-        .replace(/"/g, '\"')
+        .replace(/"/g, '\\"')
         .replace(/\n/g, '\\n')}"`;
     }
     return this.value;

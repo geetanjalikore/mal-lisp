@@ -59,17 +59,13 @@ const ns = {
   },
   'println': println,
   'prn': println,
-  'read-string': string => read_str(pr_str(string)),
+  'read-string': string => read_str(pr_str(string, true)),
   'slurp': fileName => new MalString(fs.readFileSync(fileName.value, 'utf-8')),
   'atom': value => {
-    console.log(value);
     return new MalAtom(value);
   },
   'atom?': value => value instanceof MalAtom,
   'deref': atom => {
-    console.log({ atom });
-    'true'
-    true
     return atom.deref();
   },
 };
