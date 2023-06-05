@@ -1,13 +1,15 @@
 const assert = require('assert');
+const fs = require('fs');
 const { Env } = require("./env");
+const { read_str } = require('./reader');
 const { pr_str } = require("./printer");
 const { MalList,
   MalNil,
   MalString,
   MalValue,
   MalSymbol,
-  MalIterable } = require("./types");
-
+  MalIterable,
+  MalAtom } = require("./types");
 
 const println = (...args) => {
   const result = args.reduce((res, arg) =>
@@ -57,6 +59,19 @@ const ns = {
   },
   'println': println,
   'prn': println,
+  'read-string': string => read_str(pr_str(string)),
+  'slurp': fileName => new MalString(fs.readFileSync(fileName.value, 'utf-8')),
+  'atom': value => {
+    console.log(value);
+    return new MalAtom(value);
+  },
+  'atom?': value => value instanceof MalAtom,
+  'deref': atom => {
+    console.log({ atom });
+    'true'
+    true
+    return atom.deref();
+  },
 };
 
 const env = new Env();

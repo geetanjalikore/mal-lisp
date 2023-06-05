@@ -1,3 +1,7 @@
+const pr_str = (malValue, readably) => {
+  return malValue instanceof MalValue ? malValue.pr_str(readably) : malValue.toString();
+};
+
 class MalValue {
   constructor(value) {
     this.value = value;
@@ -81,8 +85,14 @@ class MalString extends MalValue {
     super(value);
   }
 
-  pr_str() {
-    return `"${this.value}"`;
+  pr_str(readably) {
+    if (readably) {
+      return `"${this.value
+        .replace(/\\/g, "\\\\")
+        .replace(/"/g, '\"')
+        .replace(/\n/g, '\\n')}"`;
+    }
+    return this.value;
   }
 }
 
@@ -107,6 +117,20 @@ class MalFunction extends MalValue {
   }
 }
 
+class MalAtom extends MalValue {
+  constructor(value) {
+    super(value);
+  }
+
+  pr_str() {
+    return '(atom ' + this.value + ')';
+  }
+
+  deref() {
+    return this.value;
+  }
+}
+
 module.exports = {
   MalList,
   MalSymbol,
@@ -117,4 +141,6 @@ module.exports = {
   MalHashmap,
   MalFunction,
   MalIterable,
+  MalAtom,
+  pr_str
 };

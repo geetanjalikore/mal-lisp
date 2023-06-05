@@ -27,7 +27,7 @@ const tokenize = str => {
   const regEx =
     /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/g;
 
-  return [...str.matchAll(regEx)].map(x => x[1]);
+  return [...str.matchAll(regEx)].map(x => x[1]).filter(x => !x.startsWith(';'));
 };
 
 const read_seq = (reader, close) => {
@@ -50,6 +50,13 @@ const read_list = reader => new MalList(read_seq(reader, ')'));
 
 const read_hashmap = reader => new MalHashmap(read_seq(reader, '}'));
 
+const createMalString = (str) => {
+  const val = str.replace(/\\(.)/g, (y, cap) =>
+    cap === 'n' ? '\n' : cap);
+
+  return new MalString(val);
+};
+
 const read_atom = reader => {
   const token = reader.next();
   const digit = /^-?[0-9]+$/;
@@ -59,10 +66,15 @@ const read_atom = reader => {
   if (token === 'true') return true;
   if (token === 'false') return false;
   if (token.startsWith('"')) {
-    return new MalString(token.slice(1, -1))
+    return createMalString(token.slice(1, -1));
   };
 
   return new MalSymbol(token);
+};
+
+const read_deref = reader => {
+  reader.next();
+  return new MalList([new MalSymbol('deref'), new MalSymbol(reader.peek())]);
 };
 
 const read_form = reader => {
@@ -72,6 +84,7 @@ const read_form = reader => {
     case '(': return read_list(reader);
     case '[': return read_vector(reader);
     case '{': return read_hashmap(reader);
+    case '@': return read_deref(reader);
     default: return read_atom(reader);
   }
 };
@@ -82,4 +95,4 @@ const read_str = str => {
   return read_form(reader);
 };
 
-module.exports = { read_str };
+module.exports = { read_str, createMalString };
