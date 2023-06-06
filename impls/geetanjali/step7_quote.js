@@ -46,10 +46,12 @@ const evalIF = (ast, env) => {
 const bindFunction = (ast, env) => {
   const [paramList, ...fnBody] = ast.value.slice(1);
   const doForms = new MalList([new MalSymbol('do'), ...fnBody]);
+
   const fn = (expr) => {
     const fnScope = new Env(env, paramList.value, expr);
     return EVAL(doForms, fnScope);
   }
+
   return new MalFunction(doForms, paramList, env, fn);
 };
 
@@ -82,10 +84,9 @@ const quasiquote = (ast) => {
     for (let i = ast.value.length - 1; i >= 0; i--) {
       const element = ast.value[i];
 
-      if (element instanceof MalList && ast.beginsWith('splice-unquote')) {
+      if (element instanceof MalList && element.beginsWith('splice-unquote')) {
         res = new MalList([new MalSymbol('concat'), element.value[1], res]);
-      }
-      else {
+      } else {
         res = new MalList([new MalSymbol('cons'), quasiquote(element), res]);
       }
     }
@@ -97,7 +98,7 @@ const quasiquote = (ast) => {
   }
 
   return ast;
-}
+};
 
 const EVAL = (ast, env) => {
   while (true) {
@@ -120,7 +121,6 @@ const EVAL = (ast, env) => {
         return ast.value[1];
       case 'quasiquote':
         ast = quasiquote(ast.value[1]);
-        console.log({ ast });
         break;
       case 'quasiquoteexpand':
         return quasiquote(ast.value[1]);

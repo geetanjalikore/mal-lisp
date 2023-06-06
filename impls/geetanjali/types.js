@@ -48,7 +48,8 @@ class MalList extends MalIterable {
   }
 
   beginsWith(symbol) {
-    return this.value.length > 0 && this.value[0].value === symbol;
+    console.log(this.value[0]?.value === symbol, symbol, this.value[0]?.value);
+    return this.value[0]?.value === symbol;
   }
 }
 
