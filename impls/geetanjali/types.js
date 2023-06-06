@@ -23,9 +23,9 @@ class MalIterable extends MalValue {
     super(value);
   }
 
-  pr_str() {
+  pr_str(readably) {
     return this.value.map(x => {
-      return x instanceof MalValue ? x.pr_str() : x;
+      return x instanceof MalValue ? pr_str(x, readably) : x;
     }).join(' ');
   }
 
@@ -43,8 +43,12 @@ class MalList extends MalIterable {
     super(value);
   };
 
-  pr_str() {
-    return '(' + super.pr_str() + ')';
+  pr_str(readably) {
+    return '(' + super.pr_str(readably) + ')';
+  }
+
+  beginsWith(symbol) {
+    return this.value.length > 0 && this.value[0].value === symbol;
   }
 }
 
@@ -107,13 +111,20 @@ class MalNil extends MalValue {
 }
 
 class MalFunction extends MalValue {
-  constructor(fnBody, params, env) {
+  constructor(fnBody, params, env, fn) {
     super(fnBody);
     this.params = params;
     this.env = env;
+    this.fn = fn;
   }
+
   pr_str() {
     return "#<function>";
+  }
+
+  apply(_, args) {
+    console.log(args);
+    return this.fn.apply(null, args);
   }
 }
 
@@ -132,6 +143,12 @@ class MalAtom extends MalValue {
 
   reset(value) {
     this.value = value;
+    return this.value;
+  }
+
+  swap(fn, args) {
+    this.value = fn.apply(null, [this.value, ...args]);
+    console.log({ fn, args, val: this.value });
     return this.value;
   }
 }

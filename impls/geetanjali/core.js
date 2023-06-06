@@ -67,6 +67,9 @@ const ns = {
   'atom?': value => value instanceof MalAtom,
   'deref': atom => atom.deref(),
   'reset!': (atom, value) => atom.reset(value),
+  'swap!': (atom, fn, ...args) => atom.swap(fn, args),
+  'cons': (value, list) => new MalList([value, ...list.value]),
+  'concat': (...lists) => new MalList(lists.flatMap(x => x.value)),
 };
 
 const env = new Env();

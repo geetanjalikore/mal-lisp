@@ -71,6 +71,34 @@ const eval_ast = (ast, env) => {
   return ast;
 };
 
+const quasiquote = (ast) => {
+  if (ast instanceof MalList && ast.beginsWith('unquote')) {
+    return ast.value[1];
+  }
+
+  if (ast instanceof MalList) {
+    let res = new MalList([]);
+
+    for (let i = ast.value.length - 1; i >= 0; i--) {
+      const element = ast.value[i];
+
+      if (element instanceof MalList && ast.beginsWith('splice-unquote')) {
+        res = new MalList([new MalSymbol('concat'), element.value[1], res]);
+      }
+      else {
+        res = new MalList([new MalSymbol('cons'), quasiquote(element), res]);
+      }
+    }
+    return res;
+  }
+
+  if (ast instanceof MalSymbol) {
+    return new MalList([new MalSymbol('quote'), ast]);
+  }
+
+  return ast;
+}
+
 const EVAL = (ast, env) => {
   while (true) {
     if (!(ast instanceof MalList)) return eval_ast(ast, env);
@@ -88,6 +116,17 @@ const EVAL = (ast, env) => {
       case 'if':
         ast = evalIF(ast, env);
         break;
+      case 'quote':
+        return ast.value[1];
+      case 'quasiquote':
+        ast = quasiquote(ast.value[1]);
+        console.log({ ast });
+        break;
+      case 'quasiquoteexpand':
+        return quasiquote(ast.value[1]);
+      case 'unquote':
+        ast = ast.value[1];
+        break;
       case 'fn*':
         ast = bindFunction(ast, env);
         break;
@@ -104,7 +143,7 @@ const EVAL = (ast, env) => {
   }
 };
 
-const PRINT = (malValue) => pr_str(malValue);
+const PRINT = (malValue) => pr_str(malValue, true);
 
 const rep = str => PRINT(EVAL(READ(str), env));
 env.set(new MalSymbol('eval'), ast => EVAL(ast, env));
